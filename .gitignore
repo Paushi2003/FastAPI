@@ -1,3 +1,4 @@
 /fastapi
 /__pycache__
 TodoApp/__pycache__
+TodoApp/routers/__pycache__
