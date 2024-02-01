@@ -8,7 +8,7 @@ class Users(Base):
     username = Column(String, unique=True)
     firstname = Column(String)
     lastname = Column(String)
-    hashedPassword = Column(String)
+    hashedpassword = Column(String)
     is_active = Column(Boolean, default=True)
     role = Column(String)
 

@@ -38,8 +38,8 @@ async def change_password(user: user_dependency, db: db_dependency, password: Us
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='not authenticated')
     user_model = db.query(Users).filter(Users.id == user.get('id')).first()
-    if not bcrypt_context.verify(password.old_password, user_model.hashedPassword):
+    if not bcrypt_context.verify(password.old_password, user_model.hashedpassword):
         raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail='Incorrect current password')
-    user_model.hashedPassword = bcrypt_context.hash(password.new_password)
+    user_model.hashedpassword = bcrypt_context.hash(password.new_password)
     db.add(user_model)
     db.commit()
