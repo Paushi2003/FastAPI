@@ -1,11 +1,15 @@
 from fastapi import FastAPI
-import model
-from database import engine
-from routers import auth, todos, admin, users
+from .model import Base
+from .database import engine
+from .routers import auth, todos, admin, users
 
 app = FastAPI()
 
-model.Base.metadata.create_all(bind = engine)
+@app.get('/')
+async def hello():
+    return {"Welcome Message": "Welcome to Todo App"}
+
+Base.metadata.create_all(bind = engine)
 
 app.include_router(auth.router)
 

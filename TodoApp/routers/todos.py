@@ -1,8 +1,8 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status, Path
 from sqlalchemy.orm import Session
-from model import Todos
-from database import SessionLocal
+from ..model import Todos
+from ..database import SessionLocal
 from pydantic import BaseModel, Field
 from .auth import get_current_user
 
@@ -28,7 +28,7 @@ class TodoRequest(BaseModel):
     completed: bool
     
 
-@router.get('/')
+@router.get('/', status_code=status.HTTP_200_OK)
 async def read_todos(user: user_dependency, db: db_dependency):
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Unauthorized user')

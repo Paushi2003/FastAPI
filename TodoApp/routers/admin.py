@@ -1,8 +1,8 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status, Path
 from sqlalchemy.orm import Session
-from model import Todos
-from database import SessionLocal
+from ..model import Todos
+from ..database import SessionLocal
 from .auth import get_current_user
 
 router = APIRouter(
