@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import APIRouter, Depends, status, HTTPException
+from fastapi import APIRouter, Depends, status, HTTPException, Request
 from pydantic import BaseModel
 from ..model import Users
 from passlib.context import CryptContext
@@ -8,6 +8,9 @@ from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from datetime import timedelta, datetime
 from jose import jwt, JWTError
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+import os
 
 router = APIRouter(
     prefix='/auth',
@@ -19,6 +22,10 @@ oauth2bearer = OAuth2PasswordBearer(tokenUrl='auth/login')
 
 SECRET_KEY = '5edb92f9ff85ed3c3688a51f966a3f697e849fd901d3e8cdc7cc037aaaee331b'
 ALGORITHM = 'HS256'
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+templates = Jinja2Templates(directory=os.path.join(current_dir, '../templates'))
 
 class CreateUserRequest(BaseModel):
     username: str
@@ -67,6 +74,15 @@ async def get_current_user(token: Annotated[str, Depends(oauth2bearer)]):
         return {'username': username, 'id': user_id, 'role': user_role}
     except JWTError:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Could not find user')
+
+
+@router.get('/login-todo', response_class=HTMLResponse)
+async def login_todo(request:Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
+@router.get('/register-todo', response_class=HTMLResponse)
+async def register_todo(request:Request):
+    return templates.TemplateResponse("register.html", {"request": request})
 
 @router.get('/users')
 async def read_users(db: db_dependency):

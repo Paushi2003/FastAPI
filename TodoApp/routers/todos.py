@@ -1,10 +1,13 @@
 from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException, status, Path
+from fastapi import APIRouter, Depends, HTTPException, status, Path, Request
 from sqlalchemy.orm import Session
 from ..model import Todos
 from ..database import SessionLocal
 from pydantic import BaseModel, Field
 from .auth import get_current_user
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+import os
 
 router = APIRouter(
     prefix='/todos',
@@ -21,12 +24,27 @@ def get_db():
 db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[dict, Depends(get_current_user)]
 
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+templates = Jinja2Templates(directory=os.path.join(current_dir, '../templates'))
+
 class TodoRequest(BaseModel):
     title: str = Field(min_length=3)
     description: str = Field(min_length=3, max_length=100)
     priority: int = Field(gt=0, lt=6)
     completed: bool
-    
+
+@router.get('/home')
+async def test(request: Request):
+    return templates.TemplateResponse("home.html", {"request":request})
+
+@router.get('/add-todo', response_class=HTMLResponse)
+async def add_todo(request:Request):
+    return templates.TemplateResponse("add-todo.html", {"request": request})
+
+@router.get('/edit-todo', response_class=HTMLResponse)
+async def edit_todo(request:Request):
+    return templates.TemplateResponse("edit-todo.html", {"request": request})
 
 @router.get('/', status_code=status.HTTP_200_OK)
 async def read_todos(user: user_dependency, db: db_dependency):
